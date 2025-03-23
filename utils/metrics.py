@@ -3,14 +3,16 @@ import numpy as np
 from utils.logger import logger
 
 
-def calculate_metrics(original: bytes, compressed: bytes) -> dict:
+def calculate_metrics(original: bytes, compressed: bytes, decompressed: bytes) -> dict:
     original_size = len(original)
     compressed_size = len(compressed)
     compression_ratio = round(original_size / compressed_size, 6) if original_size else 0
+    decompressed_size = len(decompressed)
     return {
         "original_size": original_size,
         "compressed_size": compressed_size,
-        "compression_ratio": compression_ratio
+        "decompressed_size": decompressed_size,
+        "compression_ratio": compression_ratio  
     }
 
 

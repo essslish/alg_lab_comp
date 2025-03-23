@@ -70,6 +70,8 @@ class ExperimentRunner:
                     decompressed = compressor.decompress(compressed)
                     decomp_time = time.perf_counter() - start
 
+                    save_raw_data_to_file(decompressed, f"data/decompressed/{name}_{filename}")
+
                 except Exception as e:
                     logger.error(f"Ошибка при работе с алгоритмом {name}: {e}")
                     continue
@@ -81,11 +83,12 @@ class ExperimentRunner:
                     logger.error("Ошибка: данные не восстановились корректно.")
 
                 # Вычисление прочих метрик (размеры, коэффициент сжатия)
-                metrics = calculate_metrics(data, compressed)
+                metrics = calculate_metrics(data, compressed, decompressed)
                 row = [
                     filename, name,
                     metrics["original_size"],
                     metrics["compressed_size"],
+                    metrics["decompressed_size"],
                     metrics["compression_ratio"],
                     round(comp_time, 6),
                     round(decomp_time, 6)

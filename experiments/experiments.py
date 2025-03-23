@@ -37,8 +37,8 @@ class ExperimentRunner:
             "LZW": LZWCompressor(),
             "BWT+RLE": CombinedCompressor([BWTCompressor(block_size=512), RLECompressor()]),
             "BWT+MTF+HA": CombinedCompressor([BWTCompressor(block_size=512), MTFCompressor(), HACompressor()]),
-            "LZSS+MTF+RLE+HA": CombinedCompressor(
-                [LZSSCompressor(window_size=10000, lookahead_buffer_size=500, min_match_length=3),
+            "BWT+MTF+RLE+HA": CombinedCompressor(
+                [BWTCompressor(block_size=512),
                  MTFCompressor(),
                  RLECompressor(),
                  HACompressor()]),

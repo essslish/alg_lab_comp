@@ -16,7 +16,7 @@ from utils.metrics import calculate_metrics, save_raw_data_to_file
 
 HEADERS = [
     "filename", "compressor",
-    "original_size", "compressed_size", "compression_ratio",
+    "original_size", "compressed_size", "decompressed_size", "compression_ratio",
     "compression_time", "decompression_time"
 ]
 

@@ -10,12 +10,7 @@ class MTFCompressor(Compressor):
         self.alphabet_length = alphabet_length
 
     def compress(self, data: bytes) -> bytes:
-        """
-        Преобразует входные данные с помощью алгоритма Move-To-Front (MTF).
-        Для каждого байта определяется его индекс в алфавите,
-        затем символ перемещается в начало списка.
-        Возвращает последовательность индексов в виде байтов.
-        """
+        
         if not data:
             return b""
 
@@ -33,13 +28,7 @@ class MTFCompressor(Compressor):
         return bytes(output)
 
     def decompress(self, data: bytes) -> bytes:
-        """
-        Обратное преобразование для алгоритма MTF.
-        Для каждого индекса из входных данных:
-        - Из текущего алфавита извлекается символ по указанному индексу.
-        - Символ выводится, затем перемещается в начало алфавита.
-        Возвращает восстановленную последовательность байтов.
-        """
+       
         if not data:
             return b""
 

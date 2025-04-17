@@ -4,7 +4,6 @@ from compressor.base import Compressor
 class RLECompressor(Compressor):
     def __init__(self, min_run_length: int = 2):
         """
-        Конструктор класса RLECompressor.
         :param min_run_length: минимальная длина последовательности одинаковых байтов,
         при которой она будет считаться повторяющейся.
         Всё, что короче — будет обрабатываться как уникальная последовательность (литерал).
@@ -12,21 +11,15 @@ class RLECompressor(Compressor):
         self.min_run_length = min_run_length
 
     def compress(self, data: bytes) -> bytes:
-        """
-        Сжимает данные, используя модифицированный алгоритм RLE с использованием старшего бита.
-        Повторяющиеся и уникальные блоки кодируются по-разному, что позволяет эффективно
-        обрабатывать как повторы, так и случайные/уникальные данные.
-        """
+       
         if not data:
             return b""
 
-        # Создаём массив, в который будем поочередно добавлять сжатые данные
         compressed = bytearray()
         i = 0
         n = len(data)
 
         while i < n:
-            # Запоминаем, с какого места начинается потенциальная последовательность повторений
             run_start = i
             run_char = data[i]
             run_length = 1
@@ -41,41 +34,34 @@ class RLECompressor(Compressor):
                 # Если повторов достаточно — записываем их как блок повторений
                 # Старший бит не устанавливаем (0), остальные 7 бит — длина
                 control_byte = run_length & 0b01111111  # Сброс старшего бита на всякий случай
-                compressed.append(control_byte)  # Сначала длина
-                compressed.append(run_char)  # Потом символ, который повторяется
+                compressed.append(control_byte)  
+                compressed.append(run_char)  
                 i += 1  # Переходим к следующему байту после серии
             else:
-                # Если повторов недостаточно — начинаем формировать уникальную последовательность (литерал)
                 unique_start = run_start
                 unique_seq = bytearray()
 
-                # Собираем последовательность из разных символов, либо до конца, либо пока не встретим серию
-                # достаточно длинных повторов
+                
                 while (i < n) and (
                         (i + 1 >= n or data[i + 1] != data[i])
                         or (i - unique_start + 1 < self.min_run_length)
                 ) and (len(unique_seq) < 127):
-                    unique_seq.append(data[i])  # Добавляем байт в уникальную последовательность
-                    i += 1  # Двигаемся по данным
+                    unique_seq.append(data[i])  
+                    i += 1  
 
                 # Формируем управляющий байт: старший бит = 1 (литерал), остальные 7 бит — длина
                 control_byte = 0b10000000 | len(unique_seq)
-                compressed.append(control_byte)  # Добавляем управляющий байт
-                compressed.extend(unique_seq)  # Затем саму уникальную последовательность
+                compressed.append(control_byte)  
+                compressed.extend(unique_seq)  
 
-        # Возвращаем байты сжатого результата
+        
         return bytes(compressed)
 
     def decompress(self, data: bytes) -> bytes:
-        """
-        Восстанавливает исходные данные из сжатой формы.
-        Анализирует каждый управляющий байт, определяя тип блока (литерал или повторение),
-        и собирает исходную последовательность.
-        """
+       
         if not data:
             return b""
 
-        # Создаём массив, куда будем собирать восстановленные данные
         decompressed = bytearray()
         i = 0
         n = len(data)
@@ -91,18 +77,16 @@ class RLECompressor(Compressor):
             length = control_byte & 0b01111111
 
             if is_literal:
-                # Это уникальная последовательность: читаем `length` байтов как есть
                 if i + length > n:
                     raise ValueError("Некорректные данные: длина литералов превышает оставшиеся байты.")
-                decompressed.extend(data[i:i + length])  # Добавляем к результату
+                decompressed.extend(data[i:i + length]) 
                 i += length
             else:
-                # Это повторяющийся блок: следующий байт — это символ, который повторяется
                 if i >= n:
                     raise ValueError("Некорректные данные: отсутствует байт для повторения.")
                 byte = data[i]
-                decompressed.extend([byte] * length)  # Повторяем его `length` раз
+                decompressed.extend([byte] * length)  
                 i += 1
 
-        # Возвращаем восстановленную последовательность
+        
         return bytes(decompressed)

@@ -6,7 +6,6 @@ from compressor.base import Compressor
 class LZWCompressor(Compressor):
     def compress(self, data: bytes) -> bytes:
         """
-        Сжимает данные с использованием алгоритма LZW.
         Изначально словарь содержит все возможные байты (0-255).
         Выводится последовательность кодов, каждый из которых упаковывается в 4 байта (32 бита, big-endian).
         """
@@ -26,14 +25,12 @@ class LZWCompressor(Compressor):
             if wc in dictionary:
                 w = wc
             else:
-                # Выводим код для w
                 result_codes.append(dictionary[w])
                 # Добавляем новую последовательность wc в словарь
                 dictionary[wc] = dict_size
                 dict_size += 1
                 w = c
 
-        # Если осталась не обработанная последовательность
         if w:
             result_codes.append(dictionary[w])
 
@@ -45,10 +42,7 @@ class LZWCompressor(Compressor):
         return bytes(compressed_data)
 
     def decompress(self, data: bytes) -> bytes:
-        """
-        Восстанавливает исходные данные, декодируя последовательность 32-битных кодов,
-        сформированную алгоритмом LZW.
-        """
+        
         if not data:
             return b""
 

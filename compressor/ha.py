@@ -6,7 +6,10 @@ from compressor.base import Compressor
 
 class HACompressor(Compressor):
     class Node:
-    
+        """
+        Узел дерева Хаффмана.
+        """
+
         def __init__(self, freq, symbol=None, left=None, right=None):
             self.freq = freq
             self.symbol = symbol
@@ -27,7 +30,8 @@ class HACompressor(Compressor):
         """
         if not data:
             return b""
-        
+
+        # 1. Подсчет частот для каждого символа
         freq = {}
         for byte in data:
             freq[byte] = freq.get(byte, 0) + 1
@@ -71,7 +75,14 @@ class HACompressor(Compressor):
         return bytes(header) + bytes(compressed_data)
 
     def decompress(self, data: bytes) -> bytes:
-
+        """
+        Восстанавливает исходные данные, декодируя поток,
+        сгенерированный алгоритмом Хаффмана.
+        Шаги:
+          1. Считывание заголовка и восстановление частотной таблицы.
+          2. Построение дерева Хаффмана.
+          3. Декодирование битового потока.
+        """
         if not data:
             return b""
 
@@ -88,9 +99,11 @@ class HACompressor(Compressor):
         pad_len = struct.unpack("B", data[pos:pos + 1])[0]
         pos += 1
 
+        # Остальные данные – это сжатый поток
         compressed_bits = ""
         for byte in data[pos:]:
             compressed_bits += f"{byte:08b}"
+        # Удаляем паддинг в конце
         if pad_len:
             compressed_bits = compressed_bits[:-pad_len]
 
